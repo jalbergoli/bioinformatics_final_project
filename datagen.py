@@ -35,15 +35,22 @@ def smiles_to_seq(smiles, seq_length, char_dict=smiles_dict):
 
 
 from dataaug import SmilesEnumerator
+import numpy as np
 
 class DataGenerator(keras.utils.Sequence):
+    
     def __init__(self, X, y, seq_length, batch_size=128, data_augmentation=True, shuffle=True):
         # Agregar aca todas las propiedades necesarias para resolver el problema
         # No olvidar la aumentación de datos
+        self.X = X
+        self.y = y
+        self.seq_length = seq_length
+        self.batch_size = batch_size
+        self.data_augmentation = data_augmentation
+        self.shuffle = shuffle
+        self.sme = SmilesEnumerator()
         self.on_epoch_end()
         
-
-
     def __len__(self):
         'Denotes the number of batches per epoch'
         return int(np.ceil(len(self.X) / self.batch_size))
@@ -51,18 +58,22 @@ class DataGenerator(keras.utils.Sequence):
     def __getitem__(self, index):
         'Generate one batch of data'
         # Generate indexes of the batch
-        indexes = # Implementar
+        indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
 
         # Generate data
         if self.data_augmentation:
-            # Implementar
+            X = np.array([smiles_to_seq(self.sme.randomize_smiles(s), self.seq_length) for s in self.X[indexes]])
         else:
-            # Implementar
-        y = # Implementar
+            X = np.array([smiles_to_seq(s, self.seq_length) for s in self.X[indexes]])
+        
+        y = self.y[indexes]
         return X, y
+
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
         self.indexes = np.arange(len(self.X))
         if self.shuffle == True:
-            # Implementar
+               np.random.shuffle(self.indexes)
+            
+            
