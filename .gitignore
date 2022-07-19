@@ -1,6 +1,2 @@
 __pycache__/
-data/
-models/
 .ipynb_checkpoints/
-*.csv
-
